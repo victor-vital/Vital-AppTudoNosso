@@ -16,7 +16,7 @@ import { useApp } from '../context/AppContext';
 
 const supermarkets = [
   { id: 1, name: 'ATACK', units: 7, logo: 'LOGOTIPO' },
-  { id: 2, name: 'ATACADÃO', units: 0, logo: 'LOGOTIPO', dashed: true },
+  { id: 2, name: 'ATACADÃO', units: 0, logo: 'LOGOTIPO' },
   { id: 3, name: 'BARATÃO DA CARNE', units: 9, logo: 'LOGOTIPO', highlighted: true },
   { id: 4, name: 'CARREFOUR', units: 9, logo: 'LOGOTIPO' },
   { id: 5, name: 'COEMA', units: 4, logo: 'LOGOTIPO' },
@@ -36,6 +36,7 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
   const { setCurrentScreen } = useApp();
   const [timer, setTimer] = useState('00:00:00');
   const [seconds, setSeconds] = useState(0);
+  const [pressedButton, setPressedButton] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -56,190 +57,255 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
   }, [seconds]);
 
   const handleSupermarketPress = (supermarket) => {
+    setPressedButton(supermarket.id);
+    
+    setTimeout(() => setPressedButton(null), 200);
+    
     if (supermarket.name) {
       Alert.alert('Supermercado', `Você clicou em: ${supermarket.name}`);
     }
+  };
+
+  const handleHeaderButtonPress = (buttonName, action) => {
+    setPressedButton(buttonName);
+    
+    setTimeout(() => setPressedButton(null), 200);
+    
+    action();
   };
 
   const renderSupermarketItem = ({ item }) => {
     const rowStyle = [
       styles.tableRow,
       item.highlighted && styles.highlightedRow,
-    ];
-
-    const nameStyle = [
-      styles.supermarketName,
-      item.dashed && styles.dashedBorder,
+      pressedButton === item.id && styles.pressedButton,
+      item.id % 2 === 0 ? styles.evenRow : styles.oddRow,
     ];
 
     return (
-      <TouchableOpacity 
-        style={rowStyle}
-        onPress={() => handleSupermarketPress(item)}
-      >
-        <View style={styles.logoCell}>
-          <Text style={styles.logoText}>{item.logo}</Text>
-        </View>
-        <View style={nameStyle}>
-          <Text style={styles.nameText}>{item.name}</Text>
-        </View>
-        <View style={styles.unitsCell}>
-          <Text style={styles.unitsText}>
-            {item.units !== null ? item.units : ''}
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.itemContainer}>
+        <TouchableOpacity 
+          style={rowStyle}
+          onPress={() => handleSupermarketPress(item)}
+        >
+          <View style={styles.logoCell}>
+            <Text style={styles.logoText}>{item.logo}</Text>
+          </View>
+          <View style={styles.supermarketName}>
+            <Text style={styles.nameText}>{item.name}</Text>
+          </View>
+          <View style={styles.unitsCell}>
+            <Text style={styles.unitsText}>
+              {item.units !== null ? item.units : ''}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ccc" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" translucent={false} />
       
-      {/* Barra de notificações simulada */}
-      <View style={styles.statusBar}>
-        <Text style={styles.statusBarText}>Barra de notificações de celular</Text>
-      </View>
-
-      {/* Header Principal */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack}>
-          <Ionicons name="arrow-back" size={normalize(20)} color="white" />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>NOSSO GUIA DE COMPRAS</Text>
-          <Ionicons name="arrow-down" size={normalize(20)} color="white" />
-        </View>
-        <TouchableOpacity onPress={() => onNavigate && onNavigate('Home')}>
-          <Ionicons name="arrow-forward" size={normalize(20)} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Seção Ver Anúncios */}
-      <View style={styles.viewAdsSection}>
-        <Text style={styles.viewAdsTitle}>VER ANÚNCIOS</Text>
-        <TouchableOpacity style={styles.instructionsButton}>
-          <Text style={styles.instructionsText}>Instruções</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Cabeçalho da tabela */}
-      <View style={styles.tableHeader}>
-        <Text style={styles.tableHeaderText}>NOMES DE SUPERMERCADOS</Text>
-        <View style={styles.countBox}>
-          <Text style={styles.countText}>121</Text>
-        </View>
-      </View>
-
-      {/* Lista de Supermercados */}
-      <FlatList
-        data={supermarkets}
-        renderItem={renderSupermarketItem}
-        keyExtractor={item => item.id.toString()}
-        style={styles.list}
-        showsVerticalScrollIndicator={false}
-      />
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <Text style={styles.timer}>{timer}</Text>
-        <View style={styles.navIcons}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* Header sem faixa vermelha */}
+        <View style={styles.header}>
           <TouchableOpacity 
-            style={styles.navButton}
-            onPress={() => onNavigate && onNavigate('Home')}
+            onPress={() => handleHeaderButtonPress('header-back', onBack)}
+            style={[styles.headerButton, pressedButton === 'header-back' && styles.pressedNavButton]}
           >
-            <Ionicons name="home" size={normalize(24)} color="black" />
+            <Ionicons name="arrow-back" size={normalize(20)} color="#ff0000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <Ionicons name="person" size={normalize(24)} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.sortText}>SORTEIO</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.cpfText}>CPF</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <Ionicons name="globe" size={normalize(24)} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navButton, styles.closeButton]}>
-            <Text style={styles.closeText}>X</Text>
+          <Text style={styles.headerTitle}>NOSSO GUIA DE COMPRAS</Text>
+          <TouchableOpacity 
+            onPress={() => handleHeaderButtonPress('header-forward', () => onNavigate && onNavigate('Home'))}
+            style={[styles.headerButton, pressedButton === 'header-forward' && styles.pressedNavButton]}
+          >
+            <Ionicons name="arrow-forward" size={normalize(20)} color="#ff0000" />
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+
+        {/* Conteúdo principal com fundo azul claro */}
+        <View style={styles.blueBackground}>
+          {/* Seção Ver Anúncios */}
+          <View style={styles.viewAdsSectionContainer}>
+            <View style={styles.viewAdsSection}>
+              <Text style={styles.viewAdsTitle}>VER ANÚNCIOS</Text>
+              <TouchableOpacity 
+                style={[styles.instructionsButton, pressedButton === 'view-instructions' && styles.pressedNavButton]}
+                onPress={() => handleHeaderButtonPress('view-instructions', () => Alert.alert('Instruções', 'Função em desenvolvimento'))}
+              >
+                <Text style={styles.instructionsText}>Instruções</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Cabeçalho da tabela */}
+          <View style={styles.tableHeaderContainer}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableHeaderText}>NOMES DE SUPERMERCADOS</Text>
+              <View style={styles.countBox}>
+                <Text style={styles.countText}>121</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Lista de Supermercados */}
+          <View style={styles.listContainer}>
+            <FlatList
+              data={supermarkets}
+              renderItem={renderSupermarketItem}
+              keyExtractor={item => item.id.toString()}
+              style={styles.list}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+
+        {/* Bottom Navigation */}
+        <View style={styles.bottomNav}>
+          <Text style={styles.timer}>{timer}</Text>
+          <View style={styles.navIcons}>
+            <TouchableOpacity 
+              style={[styles.navButton, pressedButton === 'nav-home' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-home', () => onNavigate && onNavigate('Home'))}
+            >
+              <Ionicons name="home" size={normalize(24)} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, pressedButton === 'nav-person' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-person', () => Alert.alert('Perfil', 'Função em desenvolvimento'))}
+            >
+              <Ionicons name="person" size={normalize(24)} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, pressedButton === 'nav-sorteio' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-sorteio', () => Alert.alert('Sorteio', 'Função em desenvolvimento'))}
+            >
+              <Text style={styles.sortText}>SORTEIO</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, pressedButton === 'nav-cpf' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-cpf', () => Alert.alert('CPF', 'Função em desenvolvimento'))}
+            >
+              <Text style={styles.cpfText}>CPF</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, pressedButton === 'nav-globe' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-globe', () => Alert.alert('Prêmio', 'Função em desenvolvimento'))}
+            >
+              <Ionicons name="globe" size={normalize(24)} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, styles.closeButton, pressedButton === 'nav-close' && styles.pressedNavButton]}
+              onPress={() => handleHeaderButtonPress('nav-close', () => Alert.alert('Fechar', 'Deseja sair do aplicativo?'))}
+            >
+              <Text style={styles.closeText}>X</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  statusBar: {
-    backgroundColor: '#ccc',
-    paddingVertical: hp(0.5),
-    alignItems: 'center',
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  statusBarText: {
-    color: '#000',
-    fontSize: normalize(12),
-  },
+  // Header sem fundo vermelho
   header: {
-    backgroundColor: '#ff0000',
+    backgroundColor: '#f5f5f5',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     paddingHorizontal: wp(3),
-    paddingVertical: hp(1.2),
+    paddingVertical: hp(2.5),
+    paddingTop: hp(4), // Adicionado para evitar a invasão da câmera frontal
+    marginBottom: hp(0.5),
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
   },
-  headerCenter: {
-    flexDirection: 'row',
+  headerButton: {
+    padding: wp(2),
+    borderRadius: 5,
+    minWidth: wp(10),
+    minHeight: hp(4),
     alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    color: 'white',
-    fontSize: normalize(18),
+    color: '#ff0000',
+    fontSize: normalize(16),
     fontWeight: 'bold',
     fontStyle: 'italic',
-    marginRight: wp(2),
+    textAlign: 'center',
+    flex: 1,
+    marginHorizontal: wp(2),
+  },
+  blueBackground: {
+    flex: 1,
+    backgroundColor: '#b3d9ff',
+    paddingTop: hp(1),
+  },
+  viewAdsSectionContainer: {
+    marginHorizontal: wp(3),
+    marginBottom: hp(0.8),
   },
   viewAdsSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#90ee90',
+    backgroundColor: '#e8e8e8',
     paddingHorizontal: wp(2),
     paddingVertical: hp(1),
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   viewAdsTitle: {
     fontSize: normalize(16),
     fontWeight: 'bold',
   },
   instructionsButton: {
-    backgroundColor: '#e8e8ff',
+    backgroundColor: '#fff',
     paddingHorizontal: wp(2),
     paddingVertical: hp(0.5),
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: '#888',
+    borderColor: '#ccc',
   },
   instructionsText: {
-    color: '#8b4513',
+    color: '#666',
     fontSize: normalize(12),
     fontStyle: 'italic',
+  },
+  tableHeaderContainer: {
+    marginHorizontal: wp(3),
+    marginBottom: hp(0.8),
   },
   tableHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f5f5f5',
     paddingHorizontal: wp(2),
     paddingVertical: hp(1),
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   tableHeaderText: {
     fontSize: normalize(14),
@@ -251,22 +317,39 @@ const styles = StyleSheet.create({
     paddingVertical: hp(0.5),
     borderWidth: 1,
     borderColor: '#000',
+    borderRadius: 3,
   },
   countText: {
     fontSize: normalize(14),
     fontWeight: 'bold',
   },
+  listContainer: {
+    flex: 1,
+    marginHorizontal: wp(3),
+  },
   list: {
     flex: 1,
   },
+  itemContainer: {
+    marginBottom: hp(0.8),
+  },
   tableRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  evenRow: {
+    backgroundColor: '#f5f5f5',
+  },
+  oddRow: {
     backgroundColor: '#fff',
   },
   highlightedRow: {
-    backgroundColor: '#ffcc00',
+    backgroundColor: '#fff3cd',
   },
   logoCell: {
     flex: 1.5,
@@ -274,6 +357,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: '#000',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   logoText: {
     fontSize: normalize(10),
@@ -285,12 +369,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: '#000',
     justifyContent: 'center',
-  },
-  dashedBorder: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#000',
-    margin: 2,
   },
   nameText: {
     fontSize: normalize(14),
@@ -349,5 +427,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: normalize(18),
     fontWeight: 'bold',
+  },
+  // Estilo para efeito temporário de clique
+  pressedButton: {
+    backgroundColor: '#ffeaa7',
+  },
+  // Estilo para efeito temporário de clique nos botões de navegação  
+  pressedNavButton: {
+    backgroundColor: '#ffeaa7',
   },
 });

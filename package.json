@@ -19,5 +19,11 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
+ "expo-doctor": {
+  "reactNativeDirectoryCheck": {
+    "exclude": ["react-native-responsive-dimensions"]
+  }
+},
+
   "private": true
 }

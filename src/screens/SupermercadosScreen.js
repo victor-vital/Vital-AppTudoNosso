@@ -95,12 +95,6 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
           {/* Seção Supermercados */}
           <View style={styles.supermarketSectionContainer}>
             <View style={styles.supermarketSection}>
-              <TouchableOpacity 
-                onPress={() => handleHeaderButtonPress('section-back', onBack)}
-                style={[pressedButton === 'section-back' && styles.pressedNavButton]}
-              >
-                <Ionicons name="arrow-back" size={normalize(16)} color="black" style={styles.arrowIcon} />
-              </TouchableOpacity>
               <Text style={styles.supermarketTitle}>SUPERMERCADOS</Text>
               <TouchableOpacity 
                 style={[styles.instructionsButton, pressedButton === 'section-instructions' && styles.pressedNavButton]}

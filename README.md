@@ -3,7 +3,8 @@
 ## 📥 DOWNLOAD DO APLICATIVO
 
 **Link para download do APK:**
-[Clique aqui para baixar a versão mais recente](https://expo.dev/accounts/victorvital/projects/app-tudonosso/builds/6b6e3fa7-dba8-488e-8993-f8fd790d9ad2)
+[Clique aqui para baixar a versão mais recente](https://expo.dev/artifacts/eas/jgsFcj8fdk3PxebniYFU2Z.tar.gz)
+O arquivo baixado virá compactado, utilize um app de descompactação (RAR - Na PlayStore) localize o arquivo baixado na sua pasta Downloads e extraia, exitirá duas pastas, use o apk dentro da pasta "release/app-release.apk" esse será o aplicativo.
 
 ### Como instalar o APK:
 1. Toque no link acima em seu dispositivo Android

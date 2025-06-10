@@ -14,28 +14,10 @@ import { normalize, wp, hp } from '../utils/responsive';
 import { useApp } from '../context/AppContext';
 
 export default function SupermercadosScreen({ onBack, onNavigate }) {
-  const { setCurrentScreen } = useApp();
-  const [timer, setTimer] = useState('00:00:00');
-  const [seconds, setSeconds] = useState(0);
+  const { setCurrentScreen, timer } = useApp(); // Timer global
   const [pressedButton, setPressedButton] = useState(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds(s => s + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    setTimer(
-      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    );
-  }, [seconds]);
+  // Removido o timer local - agora usa o global do contexto
 
   const handleItemPress = (item) => {
     setPressedButton(item);
@@ -46,7 +28,8 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
     if (item === 'VER ANÚNCIOS') {
       onNavigate('VerAnuncios');
     } else {
-      Alert.alert('Click', `Você clicou em: ${item}`);
+      // Todos os outros botões voltam para Home
+      onNavigate('Home');
     }
   };
 
@@ -56,7 +39,13 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
     // Remove o efeito amarelado após 200ms
     setTimeout(() => setPressedButton(null), 200);
     
-    action();
+    // Se for um botão de navegação específico, executa a ação
+    if (buttonName === 'back' || buttonName === 'forward') {
+      action();
+    } else {
+      // Todos os outros botões (como instruções) voltam para Home
+      onNavigate('Home');
+    }
   };
 
   const getItemStyle = (baseStyle, itemName) => {
@@ -98,7 +87,7 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
               <Text style={styles.supermarketTitle}>SUPERMERCADOS</Text>
               <TouchableOpacity 
                 style={[styles.instructionsButton, pressedButton === 'section-instructions' && styles.pressedNavButton]}
-                onPress={() => handleHeaderButtonPress('section-instructions', () => Alert.alert('Instruções', 'Função em desenvolvimento'))}
+                onPress={() => handleHeaderButtonPress('section-instructions', () => onNavigate('Home'))}
               >
                 <Text style={styles.instructionsText}>Instruções</Text>
               </TouchableOpacity>
@@ -109,14 +98,14 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
           <View style={styles.advertiserNameContainer}>
             <View style={styles.advertiserName}>
               <TouchableOpacity 
-                onPress={() => handleHeaderButtonPress('advertiser-back', () => Alert.alert('Voltar', 'Função em desenvolvimento'))}
+                onPress={() => handleHeaderButtonPress('advertiser-back', () => onNavigate('Home'))}
                 style={[pressedButton === 'advertiser-back' && styles.pressedNavButton]}
               >
                 <Ionicons name="arrow-back" size={normalize(16)} color="black" style={styles.arrowIcon} />
               </TouchableOpacity>
               <Text style={styles.advertiserText}>NOME DO ANUNCIANTE</Text>
               <TouchableOpacity 
-                onPress={() => handleHeaderButtonPress('advertiser-forward', () => Alert.alert('Avançar', 'Função em desenvolvimento'))}
+                onPress={() => handleHeaderButtonPress('advertiser-forward', () => onNavigate('Home'))}
                 style={[pressedButton === 'advertiser-forward' && styles.pressedNavButton]}
               >
                 <Ionicons name="arrow-forward" size={normalize(16)} color="black" style={styles.arrowIcon} />
@@ -250,31 +239,31 @@ export default function SupermercadosScreen({ onBack, onNavigate }) {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.navButton, pressedButton === 'nav-person' && styles.pressedNavButton]}
-              onPress={() => handleHeaderButtonPress('nav-person', () => Alert.alert('Perfil', 'Função em desenvolvimento'))}
+              onPress={() => handleHeaderButtonPress('nav-person', () => onNavigate('Home'))}
             >
               <Ionicons name="person" size={normalize(24)} color="black" />
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.navButton, pressedButton === 'nav-sorteio' && styles.pressedNavButton]}
-              onPress={() => handleHeaderButtonPress('nav-sorteio', () => Alert.alert('Sorteio', 'Função em desenvolvimento'))}
+              onPress={() => handleHeaderButtonPress('nav-sorteio', () => onNavigate('Home'))}
             >
               <Text style={styles.sortText}>SORTEIO</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.navButton, pressedButton === 'nav-cpf' && styles.pressedNavButton]}
-              onPress={() => handleHeaderButtonPress('nav-cpf', () => Alert.alert('CPF', 'Função em desenvolvimento'))}
+              onPress={() => handleHeaderButtonPress('nav-cpf', () => onNavigate('Home'))}
             >
               <Text style={styles.cpfText}>CPF</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.navButton, pressedButton === 'nav-globe' && styles.pressedNavButton]}
-              onPress={() => handleHeaderButtonPress('nav-globe', () => Alert.alert('Prêmio', 'Função em desenvolvimento'))}
+              onPress={() => handleHeaderButtonPress('nav-globe', () => onNavigate('Home'))}
             >
               <Ionicons name="globe" size={normalize(24)} color="black" />
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.navButton, styles.closeButton, pressedButton === 'nav-close' && styles.pressedNavButton]}
-              onPress={() => handleHeaderButtonPress('nav-close', () => Alert.alert('Fechar', 'Deseja sair do aplicativo?'))}
+              onPress={() => handleHeaderButtonPress('nav-close', () => onNavigate('Home'))}
             >
               <Text style={styles.closeText}>X</Text>
             </TouchableOpacity>

@@ -14,41 +14,41 @@ import { Ionicons } from '@expo/vector-icons';
 import { normalize, wp, hp } from '../utils/responsive';
 import { useApp } from '../context/AppContext';
 
-const supermarkets = [
-  { id: 1, name: 'ATACK', units: 7, logo: 'LOGOTIPO' },
-  { id: 2, name: 'ATACADÃO', units: 0, logo: 'LOGOTIPO' },
-  { id: 3, name: 'BARATÃO DA CARNE', units: 9, logo: 'LOGOTIPO', highlighted: true },
-  { id: 4, name: 'CARREFOUR', units: 9, logo: 'LOGOTIPO' },
-  { id: 5, name: 'COEMA', units: 4, logo: 'LOGOTIPO' },
-  { id: 6, name: 'DB', units: 38, logo: 'LOGOTIPO' },
-  { id: 7, name: 'NOVA ERA', units: 12, logo: 'LOGOTIPO' },
-  { id: 8, name: 'NOVO TEMPO', units: 14, logo: 'LOGOTIPO' },
-  { id: 9, name: 'RODRIGUES', units: 14, logo: 'LOGOTIPO' },
-  { id: 10, name: '', units: null, logo: 'LOGOTIPO' },
-  { id: 11, name: '', units: null, logo: 'LOGOTIPO' },
-  { id: 12, name: '', units: null, logo: 'LOGOTIPO' },
-  { id: 13, name: '', units: null, logo: 'LOGOTIPO' },
-  { id: 14, name: '', units: null, logo: 'LOGOTIPO' },
-  { id: 15, name: '', units: null, logo: 'LOGOTIPO' },
+const localidades = [
+  { id: 1, name: 'ALVORADA 1', highlighted: false },
+  { id: 2, name: 'ALVORADA 2', highlighted: false },
+  { id: 3, name: 'BETÂNIA', highlighted: false },
+  { id: 4, name: 'CACHOEIRINHA', highlighted: false },
+  { id: 5, name: 'COMPENSA', highlighted: false },
+  { id: 6, name: 'TORQUATO/SANTOS SUMONT', highlighted: false },
+  { id: 7, name: 'CENTRO', highlighted: false },
+  { id: 8, name: 'CIDADE NOVA 1', highlighted: false },
+  { id: 9, name: 'CIDADE NOVA 2', highlighted: false },
+  { id: 10, name: 'TORQUATO/SANTA ETELVINA', highlighted: false },
+  { id: 11, name: 'NOVA CIDADE', highlighted: false },
+  { id: 12, name: '', highlighted: false }, // Linhas vazias como na imagem
+  { id: 13, name: '', highlighted: false },
+  { id: 14, name: '', highlighted: false },
+  { id: 15, name: '', highlighted: false },
 ];
 
-export default function VerAnunciosScreen({ onBack, onNavigate }) {
+export default function EscolherLocalidadeScreen({ onBack, onNavigate }) {
   const { setCurrentScreen, timer } = useApp(); // Timer global
   const [pressedButton, setPressedButton] = useState(null);
 
   // Removido o timer local - agora usa o global do contexto
 
-  const handleSupermarketPress = (supermarket) => {
-    setPressedButton(supermarket.id);
+  const handleLocalidadePress = (localidade) => {
+    setPressedButton(localidade.id);
     
     setTimeout(() => setPressedButton(null), 200);
     
-    if (supermarket.name) {
-      // Se for o BARATÃO DA CARNE, navegar para EscolherLocalidade
-      if (supermarket.name === 'BARATÃO DA CARNE') {
-        onNavigate('EscolherLocalidade');
+    if (localidade.name) {
+      // Se for TORQUATO/SANTOS SUMONT, navegar para LojaDetalhes
+      if (localidade.name === 'TORQUATO/SANTOS SUMONT') {
+        onNavigate('LojaDetalhes');
       } else {
-        // Todos os outros supermercados voltam para Home
+        // Todas as outras localidades voltam para Home
         onNavigate('Home');
       }
     }
@@ -62,31 +62,20 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
     action();
   };
 
-  const renderSupermarketItem = ({ item }) => {
+  const renderLocalidadeItem = ({ item }) => {
     const rowStyle = [
-      styles.tableRow,
+      styles.localidadeRow,
       item.highlighted && styles.highlightedRow,
       pressedButton === item.id && styles.pressedButton,
-      item.id % 2 === 0 ? styles.evenRow : styles.oddRow,
     ];
 
     return (
       <View style={styles.itemContainer}>
         <TouchableOpacity 
           style={rowStyle}
-          onPress={() => handleSupermarketPress(item)}
+          onPress={() => handleLocalidadePress(item)}
         >
-          <View style={styles.logoCell}>
-            <Text style={styles.logoText}>{item.logo}</Text>
-          </View>
-          <View style={styles.supermarketName}>
-            <Text style={styles.nameText}>{item.name}</Text>
-          </View>
-          <View style={styles.unitsCell}>
-            <Text style={styles.unitsText}>
-              {item.units !== null ? item.units : ''}
-            </Text>
-          </View>
+          <Text style={styles.localidadeText}>{item.name}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -97,7 +86,7 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" translucent={false} />
       
       <SafeAreaView style={styles.safeArea}>
-        {/* Header sem faixa vermelha */}
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity 
             onPress={() => handleHeaderButtonPress('header-back', onBack)}
@@ -107,7 +96,7 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>NOSSO GUIA DE COMPRAS</Text>
           <TouchableOpacity 
-            onPress={() => handleHeaderButtonPress('header-forward', () => onNavigate && onNavigate('EscolherLocalidade'))}
+            onPress={() => handleHeaderButtonPress('header-forward', () => onNavigate && onNavigate('LojaDetalhes'))}
             style={[styles.headerButton, pressedButton === 'header-forward' && styles.pressedNavButton]}
           >
             <Ionicons name="arrow-forward" size={normalize(20)} color="#ff0000" />
@@ -116,34 +105,31 @@ export default function VerAnunciosScreen({ onBack, onNavigate }) {
 
         {/* Conteúdo principal com fundo azul claro */}
         <View style={styles.blueBackground}>
-          {/* Seção Ver Anúncios */}
-          <View style={styles.viewAdsSectionContainer}>
-            <View style={styles.viewAdsSection}>
-              <Text style={styles.viewAdsTitle}>VER ANÚNCIOS</Text>
+          {/* Seção Baratão da Carne */}
+          <View style={styles.supermarketSectionContainer}>
+            <View style={styles.supermarketSection}>
+              <Text style={styles.supermarketTitle}>BARATÃO DA CARNE</Text>
               <TouchableOpacity 
-                style={[styles.instructionsButton, pressedButton === 'view-instructions' && styles.pressedNavButton]}
-                onPress={() => handleHeaderButtonPress('view-instructions', () => Alert.alert('Instruções', 'Função em desenvolvimento'))}
+                style={[styles.instructionsButton, pressedButton === 'section-instructions' && styles.pressedNavButton]}
+                onPress={() => handleHeaderButtonPress('section-instructions', () => Alert.alert('Instruções', 'Função em desenvolvimento'))}
               >
                 <Text style={styles.instructionsText}>Instruções</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Cabeçalho da tabela */}
-          <View style={styles.tableHeaderContainer}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText}>NOMES DE SUPERMERCADOS</Text>
-              <View style={styles.countBox}>
-                <Text style={styles.countText}>121</Text>
-              </View>
+          {/* Título - escolher localidade/bairro */}
+          <View style={styles.titleContainer}>
+            <View style={styles.titleSection}>
+              <Text style={styles.titleText}>ESCOLHER LOCALIDADE/BAIRRO</Text>
             </View>
           </View>
 
-          {/* Lista de Supermercados */}
+          {/* Lista de Localidades */}
           <View style={styles.listContainer}>
             <FlatList
-              data={supermarkets}
-              renderItem={renderSupermarketItem}
+              data={localidades}
+              renderItem={renderLocalidadeItem}
               keyExtractor={item => item.id.toString()}
               style={styles.list}
               showsVerticalScrollIndicator={false}
@@ -207,7 +193,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  // Header sem fundo vermelho
   header: {
     backgroundColor: '#f5f5f5',
     flexDirection: 'row',
@@ -215,7 +200,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: wp(3),
     paddingVertical: hp(2.5),
-    paddingTop: hp(4), // Adicionado para evitar a invasão da câmera frontal
+    paddingTop: hp(4),
     marginBottom: hp(0.5),
     borderBottomWidth: 2,
     borderBottomColor: '#000',
@@ -242,11 +227,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#b3d9ff',
     paddingTop: hp(1),
   },
-  viewAdsSectionContainer: {
+  supermarketSectionContainer: {
     marginHorizontal: wp(3),
     marginBottom: hp(0.8),
   },
-  viewAdsSection: {
+  supermarketSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -260,7 +245,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
-  viewAdsTitle: {
+  supermarketTitle: {
     fontSize: normalize(16),
     fontWeight: 'bold',
   },
@@ -277,14 +262,11 @@ const styles = StyleSheet.create({
     fontSize: normalize(12),
     fontStyle: 'italic',
   },
-  tableHeaderContainer: {
+  titleContainer: {
     marginHorizontal: wp(3),
     marginBottom: hp(0.8),
   },
-  tableHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  titleSection: {
     backgroundColor: '#f5f5f5',
     paddingHorizontal: wp(2),
     paddingVertical: hp(1),
@@ -294,22 +276,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    alignItems: 'center',
   },
-  tableHeaderText: {
-    fontSize: normalize(14),
+  titleText: {
+    fontSize: normalize(16),
     fontWeight: 'bold',
-  },
-  countBox: {
-    backgroundColor: '#fff',
-    paddingHorizontal: wp(3),
-    paddingVertical: hp(0.5),
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 3,
-  },
-  countText: {
-    fontSize: normalize(14),
-    fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: '#000',
+    textAlign: 'center',
   },
   listContainer: {
     flex: 1,
@@ -321,58 +295,29 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginBottom: hp(0.8),
   },
-  tableRow: {
-    flexDirection: 'row',
+  localidadeRow: {
+    backgroundColor: '#fff',
+    paddingHorizontal: wp(2),
+    paddingVertical: hp(1.5),
     borderRadius: 5,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-  },
-  evenRow: {
-    backgroundColor: '#f5f5f5',
-  },
-  oddRow: {
-    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   highlightedRow: {
     backgroundColor: '#fff3cd',
+    borderColor: '#ff0000',
+    borderWidth: 2,
   },
-  logoCell: {
-    flex: 1.5,
-    padding: hp(1),
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: normalize(10),
-    textAlign: 'center',
-  },
-  supermarketName: {
-    flex: 3,
-    padding: hp(1),
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    justifyContent: 'center',
-  },
-  nameText: {
+  localidadeText: {
     fontSize: normalize(14),
     fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  unitsCell: {
-    flex: 1,
-    padding: hp(1),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  unitsText: {
-    fontSize: normalize(14),
-    fontWeight: 'bold',
-    color: '#ff0000',
+    textAlign: 'left',
+    paddingLeft: wp(2),
   },
   // Bottom Navigation
   bottomNav: {

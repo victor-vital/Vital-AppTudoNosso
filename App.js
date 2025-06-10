@@ -1,4 +1,22 @@
-import React, { useState, useEffect } from 'react';
+const navigateBack = () => {
+    if (navigation === 'FormaPagamento') {
+      setNavigation('CarrinhoCompras');
+    } else if (navigation === 'CarrinhoCompras') {
+      setNavigation('ProdutoDetalhes');
+    } else if (navigation === 'ProdutoDetalhes') {
+      setNavigation('PrecosNoMuro');
+    } else if (navigation === 'PrecosNoMuro' || navigation === 'ValidadeAvaria' || navigation === 'PromocaoDesapega') {
+      setNavigation('LojaDetalhes');
+    } else if (navigation === 'LojaDetalhes') {
+      setNavigation('EscolherLocalidade');
+    } else if (navigation === 'EscolherLocalidade') {
+      setNavigation('VerAnuncios');
+    } else if (navigation === 'VerAnuncios') {
+      setNavigation('Supermercados');
+    } else {
+      setNavigation('Home');
+    }
+  };import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,6 +32,12 @@ import { normalize, wp, hp } from './src/utils/responsive';
 import { AppProvider, useApp } from './src/context/AppContext';
 import SupermercadosScreen from './src/screens/SupermercadosScreen';
 import VerAnunciosScreen from './src/screens/VerAnunciosScreen';
+import EscolherLocalidadeScreen from './src/screens/EscolherLocalidadeScreen';
+import LojaDetalhesScreen from './src/screens/LojaDetalhesScreen';
+import PrecosNoMuroScreen from './src/screens/PrecosNoMuroScreen';
+import ProdutoDetalhesScreen from './src/screens/ProdutoDetalhesScreen';
+import CarrinhoComprasScreen from './src/screens/CarrinhoComprasScreen';
+import FormaPagamentoScreen from './src/screens/FormaPagamentoScreen';
 
 function MainScreen() {
   const {
@@ -23,31 +47,14 @@ function MainScreen() {
     setCurrentScreen,
     downloads,
     views,
+    timer, // Timer global do contexto
   } = useApp();
   
-  const [timer, setTimer] = useState('00:00:00');
-  const [seconds, setSeconds] = useState(0);
   const [navigation, setNavigation] = useState('Home');
   const [pressedButton, setPressedButton] = useState(null);
   const [pressedNavButton, setPressedNavButton] = useState(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds(s => s + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    setTimer(
-      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    );
-  }, [seconds]);
+  // Removido o timer local - agora usa o global do contexto
 
   const handleNavigation = (direction) => {
     if (direction === 'direita') {
@@ -55,6 +62,18 @@ function MainScreen() {
         setNavigation('Supermercados');
       } else if (navigation === 'Supermercados') {
         setNavigation('VerAnuncios');
+      } else if (navigation === 'VerAnuncios') {
+        setNavigation('EscolherLocalidade');
+      } else if (navigation === 'EscolherLocalidade') {
+        setNavigation('LojaDetalhes');
+      } else if (navigation === 'LojaDetalhes') {
+        setNavigation('PrecosNoMuro');
+      } else if (navigation === 'PrecosNoMuro') {
+        setNavigation('ProdutoDetalhes');
+      } else if (navigation === 'ProdutoDetalhes') {
+        setNavigation('CarrinhoCompras');
+      } else if (navigation === 'CarrinhoCompras') {
+        setNavigation('FormaPagamento');
       }
     } else if (direction === 'esquerda') {
       navigateBack();
@@ -65,20 +84,19 @@ function MainScreen() {
     markAsClicked(item);
     setPressedButton(item);
     
-    // Remove o efeito amarelado após 200ms
     setTimeout(() => setPressedButton(null), 200);
     
     if (item === 'supermercados') {
       setNavigation('Supermercados');
     } else {
-      Alert.alert('Click', `Você clicou em ${item}`);
+      // Todos os outros botões voltam para Home (já está em Home, só mostra feedback)
+      Alert.alert('Navegação', 'Você já está na tela inicial');
     }
   };
 
   const handleNavButtonPress = (buttonName, action) => {
     setPressedNavButton(buttonName);
     
-    // Remove o efeito amarelado após 200ms
     setTimeout(() => setPressedNavButton(null), 200);
     
     action();
@@ -87,7 +105,6 @@ function MainScreen() {
   const handleHeaderButtonPress = (buttonName, action) => {
     setPressedNavButton(buttonName);
     
-    // Remove o efeito amarelado após 200ms
     setTimeout(() => setPressedNavButton(null), 200);
     
     action();
@@ -113,7 +130,15 @@ function MainScreen() {
   };
 
   const navigateBack = () => {
-    if (navigation === 'VerAnuncios') {
+    if (navigation === 'ProdutoDetalhes') {
+      setNavigation('PrecosNoMuro');
+    } else if (navigation === 'PrecosNoMuro' || navigation === 'ValidadeAvaria' || navigation === 'PromocaoDesapega') {
+      setNavigation('LojaDetalhes');
+    } else if (navigation === 'LojaDetalhes') {
+      setNavigation('EscolherLocalidade');
+    } else if (navigation === 'EscolherLocalidade') {
+      setNavigation('VerAnuncios');
+    } else if (navigation === 'VerAnuncios') {
       setNavigation('Supermercados');
     } else {
       setNavigation('Home');
@@ -122,17 +147,102 @@ function MainScreen() {
 
   // Renderizar a tela apropriada baseado no estado de navegação
   if (navigation === 'Supermercados') {
-    return <SupermercadosScreen 
-      onBack={() => setNavigation('Home')} 
-      onNavigate={navigateToScreen}
-    />;
+    return (
+      <SupermercadosScreen 
+        onBack={() => setNavigation('Home')} 
+        onNavigate={navigateToScreen}
+      />
+    );
   }
 
   if (navigation === 'VerAnuncios') {
-    return <VerAnunciosScreen 
-      onBack={navigateBack} 
-      onNavigate={navigateToScreen}
-    />;
+    return (
+      <VerAnunciosScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  if (navigation === 'EscolherLocalidade') {
+    return (
+      <EscolherLocalidadeScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  if (navigation === 'LojaDetalhes') {
+    return (
+      <LojaDetalhesScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  // Tela de Preços no Muro
+  if (navigation === 'PrecosNoMuro') {
+    return (
+      <PrecosNoMuroScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  // Tela de Detalhes do Produto
+  if (navigation === 'ProdutoDetalhes') {
+    return (
+      <ProdutoDetalhesScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  // Tela do Carrinho de Compras
+  if (navigation === 'CarrinhoCompras') {
+    return (
+      <CarrinhoComprasScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  // Tela de Forma de Pagamento
+  if (navigation === 'FormaPagamento') {
+    return (
+      <FormaPagamentoScreen 
+        onBack={navigateBack} 
+        onNavigate={navigateToScreen}
+      />
+    );
+  }
+
+  // Placeholder para as outras telas de promoção
+  if (navigation === 'ValidadeAvaria') {
+    return (
+      <View style={styles.container}>
+        <Text>Tela Validade/Avaria - Em desenvolvimento</Text>
+        <TouchableOpacity onPress={navigateBack}>
+          <Text>Voltar</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (navigation === 'PromocaoDesapega') {
+    return (
+      <View style={styles.container}>
+        <Text>Tela Promoção Desapega - Em desenvolvimento</Text>
+        <TouchableOpacity onPress={navigateBack}>
+          <Text>Voltar</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   // Tela Principal (Home)
@@ -351,7 +461,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: wp(3),
     paddingVertical: hp(2.5),
-    paddingTop: hp(4), // Aumentado para evitar a invasão da câmera frontal
+    paddingTop: hp(4),
     marginBottom: hp(0.5),
     borderBottomWidth: 2,
     borderBottomColor: '#000',
@@ -644,17 +754,14 @@ const styles = StyleSheet.create({
     fontSize: normalize(16),
     fontWeight: 'bold',
   },
-  // Estilo para itens clicados (permanente)
   clickedItem: {
     backgroundColor: '#fff3cd',
     borderColor: '#ff0000',
     borderWidth: 3,
   },
-  // Estilo para efeito temporário de clique nos itens
   pressedButton: {
     backgroundColor: '#ffeaa7',
   },
-  // Estilo para efeito temporário de clique nos botões de navegação
   pressedNavButton: {
     backgroundColor: '#ffeaa7',
   },
